@@ -34,6 +34,7 @@ def custom_openapi():
         version=settings.APP_VERSION,
         routes=app.routes,
     )
+    
     schema["components"]["securitySchemes"] = {
         "ApiKeyAuth": {
             "type": "apiKey",
@@ -41,6 +42,11 @@ def custom_openapi():
             "name": "X-API-Key",
         }
     }
+    # Terapkan ke semua endpoint
+    for path in schema["paths"].values():
+        for method in path.values():
+            method["security"] = [{"ApiKeyAuth": []}]
+
     app.openapi_schema = schema
     return app.openapi_schema
 
