@@ -1,0 +1,65 @@
+# ==============================
+# Model Files — JANGAN di-commit
+# ==============================
+model/
+*.onnx
+*.h5
+*.pb
+*.pt
+*.pth
+*.pkl
+*.joblib
+*.tflite
+
+# ==============================
+# Python
+# ==============================
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# ==============================
+# Virtual Environment
+# ==============================
+.venv/
+venv/
+env/
+ENV/
+
+# ==============================
+# Environment Variables
+# ==============================
+.env
+.env.*
+!.env.example
+
+# ==============================
+# IDE & Editor
+# ==============================
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# ==============================
+# Logs & Temp
+# ==============================
+*.log
+*.tmp
+*.cache
+/tmp/
+
+# ==============================
+# Testing
+# ==============================
+.pytest_cache/
+.coverage
+htmlcov/
