@@ -17,7 +17,7 @@ class Settings:
     IMG_SIZE: tuple[int, int] = (224, 224)
 
     # Kelas sesuai urutan output model
-    CLASSES: list[str] = ["mentah", "setengahMatang", "matang", "busuk"]
+    CLASSES: list[str] = ["matang", "setengahMatang", "busuk", "mentah"]
 
     # API Key — wajib di-set via environment variable di Railway
     # Generate contoh: python -c "import secrets; print(secrets.token_hex(32))"
