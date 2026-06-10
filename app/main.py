@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.openapi.utils import get_openapi
 from contextlib import asynccontextmanager
 
 from app.config.settings import settings
@@ -25,6 +26,49 @@ app = FastAPI(
     description="API Klasifikasi Kematangan Tempe menggunakan ONNX Runtime",
     lifespan=lifespan,
 )
+
+
+def custom_openapi():
+    if app.openapi_schema:
+        return app.openapi_schema
+    schema = get_openapi(
+        title=settings.APP_NAME,
+        version=settings.APP_VERSION,
+        routes=app.routes,
+    )
+    # Tambahkan security scheme X-API-Key ke Swagger UI
+    schema["components"]["securitySchemes"] = {
+        "ApiKeyAuth": {
+            "type": "apiKey",
+            "in": "header",
+            "name": "X-API-Key",
+        }
+    }
+    app.openapi_schema = schema
+    return app.openapi_schema
+
+
+app.openapi = custom_openapi
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+app.include_router(health.router, tags=["Health"])
+app.include_router(predict.router, tags=["Prediction"])
+
+
+@app.get("/", tags=["Root"])
+async def root():
+    return {
+        "app": settings.APP_NAME,
+        "version": settings.APP_VERSION,
+        "docs": "/docs",
+    }
 
 app.add_middleware(
     CORSMiddleware,

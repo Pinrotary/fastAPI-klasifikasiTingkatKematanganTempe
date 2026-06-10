@@ -1,8 +1,9 @@
 import time
-from fastapi import APIRouter, Request, UploadFile, File, HTTPException
+from fastapi import APIRouter, Request, UploadFile, File, HTTPException, Depends
 
 from app.models.schemas import PredictResponse
 from app.services.preprocessing_service import PreprocessingService
+from app.utils.auth import verify_api_key
 
 router = APIRouter()
 _preprocessor = PreprocessingService()
@@ -12,6 +13,7 @@ _preprocessor = PreprocessingService()
 async def predict(
     request: Request,
     image: UploadFile = File(..., description="Gambar tempe (jpg/png/webp)"),
+    _: str = Depends(verify_api_key),
 ):
     # --- Validasi tipe file ---
     allowed_types = {"image/jpeg", "image/png", "image/webp"}
