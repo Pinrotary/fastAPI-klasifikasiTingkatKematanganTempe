@@ -12,8 +12,8 @@ _preprocessor = PreprocessingService()
 @router.post("/predict", response_model=PredictResponse)
 async def predict(
     request: Request,
+    _: str = Depends(verify_api_key), 
     image: UploadFile = File(..., description="Gambar tempe (jpg/png/webp)"),
-    _: str = Depends(verify_api_key),
 ):
     # --- Validasi tipe file ---
     allowed_types = {"image/jpeg", "image/png", "image/webp"}

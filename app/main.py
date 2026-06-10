@@ -10,13 +10,11 @@ from app.services.onnx_service import OnnxService
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Startup: load ONNX model once
     onnx_service = OnnxService()
     onnx_service.load_model()
     app.state.onnx_service = onnx_service
     print("✓ ONNX model loaded and ready.")
     yield
-    # Shutdown
     print("Shutting down...")
 
 
@@ -36,7 +34,6 @@ def custom_openapi():
         version=settings.APP_VERSION,
         routes=app.routes,
     )
-    # Tambahkan security scheme X-API-Key ke Swagger UI
     schema["components"]["securitySchemes"] = {
         "ApiKeyAuth": {
             "type": "apiKey",
@@ -49,26 +46,6 @@ def custom_openapi():
 
 
 app.openapi = custom_openapi
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-app.include_router(health.router, tags=["Health"])
-app.include_router(predict.router, tags=["Prediction"])
-
-
-@app.get("/", tags=["Root"])
-async def root():
-    return {
-        "app": settings.APP_NAME,
-        "version": settings.APP_VERSION,
-        "docs": "/docs",
-    }
 
 app.add_middleware(
     CORSMiddleware,
