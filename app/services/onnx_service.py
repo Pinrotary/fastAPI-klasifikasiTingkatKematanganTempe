@@ -1,5 +1,7 @@
 import numpy as np
 import onnxruntime as ort
+import os
+from huggingface_hub import hf_hub_download
 from pathlib import Path
 
 from app.config.settings import settings
@@ -16,17 +18,15 @@ class OnnxService:
         self._input_name: str | None = None
 
     def load_model(self) -> None:
-        """Muat model ONNX dari disk. Dipanggil satu kali saat lifespan startup."""
-        model_path = Path(settings.MODEL_PATH)
-        if not model_path.exists():
-            raise FileNotFoundError(
-                f"Model tidak ditemukan: {model_path}\n"
-                "Letakkan file tempe_classifier.onnx di folder model/"
-            )
-
-        providers = ["CPUExecutionProvider"]
-        self._session = ort.InferenceSession(str(model_path), providers=providers)
+        model_path = hf_hub_download(
+            repo_id="Pinrotary/model-klasifikasi-tempe", 
+            filename="mobilenetv2_tempe.onnx",
+            token=os.getenv("HF_TOKEN"),          
+        )
+        self._session = ort.InferenceSession(model_path, providers=["CPUExecutionProvider"])
         self._input_name = self._session.get_inputs()[0].name
+
+        
         print(f"  Model path  : {model_path}")
         print(f"  Input name  : {self._input_name}")
         print(f"  Input shape : {self._session.get_inputs()[0].shape}")
