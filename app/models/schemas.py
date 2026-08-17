@@ -13,7 +13,7 @@ class PredictResponse(BaseModel):
     model_config = {
         "json_schema_extra": {
             "example": {
-                "prediction": "matang",
+                "prediction": "fermentasiOptimal",
                 "confidence": 0.9634,
                 "processing_time": 0.24,
             }
