@@ -1,21 +1,20 @@
 import io
 import numpy as np
-import tensorflow as tf
 from PIL import Image
 from app.config.settings import settings
 
 
 class PreprocessingService:
     """
-    Tahapan preprocessing:
-      1. Decode image bytes menggunakan tf.image.decode_image()
-      2. Konversi menjadi 3 channel RGB
-      3. Resize ke IMG_SIZE (224, 224)
-      4. Menggunakan interpolasi BILINEAR
-      5. antialias=False
-      6. Konversi ke float32
-      7. Normalisasi dengan / 255.0
-      8. Menambahkan batch dimension
+    Preprocessing identik dengan pipeline training.
+
+    Pipeline:
+      1. Decode image menggunakan PIL
+      2. Convert ke RGB
+      3. Resize ke IMG_SIZE menggunakan PIL BILINEAR
+      4. Convert ke float32
+      5. Normalisasi /255.0
+      6. Tambahkan batch dimension
 
     Output:
       Shape  : (1, 224, 224, 3)
@@ -24,35 +23,33 @@ class PreprocessingService:
     """
 
     def preprocess_bytes(self, image_bytes: bytes) -> np.ndarray:
-        """Preprocess raw image bytes menjadi tensor siap inferensi."""
+        """Preprocess raw image bytes secara identik dengan training."""
 
-        # Decode gambar
-        img_tensor = tf.image.decode_image(
-            image_bytes,
-            channels=3,
-            expand_animations=False
+        # Decode + RGB
+        img = Image.open(io.BytesIO(image_bytes)).convert("RGB")
+
+        # Resize identik dengan training
+        img = img.resize(
+            settings.IMG_SIZE,
+            Image.BILINEAR
         )
 
-        # Resize ke ukuran input model
-        img_tensor = tf.image.resize(
-            img_tensor,
-            settings.IMG_SIZE,  # (224, 224)
-            method=tf.image.ResizeMethod.BILINEAR,
-            antialias=False
+        # Convert ke float32
+        arr = np.array(
+            img,
+            dtype=np.float32
         )
 
-        # Normalisasi ke range [0.0, 1.0]
-        img_tensor = tf.cast(
-            img_tensor,
-            tf.float32
-        ) / 255.0
+        # Normalisasi
+        arr = arr / 255.0
 
         # Tambahkan batch dimension
-        # (224, 224, 3) → (1, 224, 224, 3)
-        return np.expand_dims(
-            img_tensor.numpy(),
+        arr = np.expand_dims(
+            arr,
             axis=0
         )
+
+        return arr
 
     def validate_image(self, image_bytes: bytes) -> bool:
         """Memastikan bytes dapat dibuka sebagai gambar valid."""
