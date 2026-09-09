@@ -7,6 +7,8 @@ from app.config.settings import settings
 
 class PreprocessingService:
     """
+    Preprocessing menggunakan TensorFlow.
+
     Tahapan preprocessing:
       1. Decode image bytes menggunakan tf.image.decode_image()
       2. Konversi menjadi 3 channel RGB
